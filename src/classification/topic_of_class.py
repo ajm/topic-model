@@ -16,11 +16,9 @@ import numpy as np
 from collections import Counter
 
 import ioFile
-import pathTraverse
+from src.backend import fileSys
 
-'''
-fun=0, category; fun=1, acm-class
-'''
+
 def classificationOfDocument(data_iterator, clf_dict, fun):
     all_clf = []
     unique_clf = set()
@@ -80,11 +78,11 @@ def plotCategory(categories, categories_dict):
         
     print convert_categories
     
-def topicOfClassificationForAllYear(probDir, topicDir, classDir, clf_dict, fun):
+def topicOfClassificationForAllYear(probDir, modelDir, classDir, clf_dict, fun):
 
-    probFiles = pathTraverse.traverseDirectory(probDir)
-    topicFiles = pathTraverse.traverseDirectory(topicDir)
-    classFiles = pathTraverse.traverseDirectory(classDir)
+    probFiles = fileSys.traverseDirectory(probDir)
+    topicFiles = fileSys.traverseTopicDirecotry(modelDir, 1)
+    classFiles = fileSys.traverseDirectory(classDir)
     
     N = len(probFiles)
     if len(topicFiles) != N or len(classFiles) != N:
@@ -159,10 +157,14 @@ if __name__ == "__main__":
                          dest='prob',
                          help='Directory',
                          default=None)
-    optparser.add_option('-t', '--topicDir',
-                         dest='topic',
+    optparser.add_option('-m', '--modelDir',
+                         dest='model',
                          help='Directory',
                          default=None)
+    optparser.add_option('-f', '--className',
+                         dest='class_name',
+                         help='className',
+                         default=None)    
     optparser.add_option('-c', '--classDir',
                          dest='clf',
                          help='Directory',
@@ -184,11 +186,23 @@ if __name__ == "__main__":
     elif options.prob is not None:
             probDir = options.prob
 
-    if options.topic is None:
+    if options.model is None:
             print 'No topic filename specified, system with exit\n'
             sys.exit('System will exit')
-    elif options.topic is not None:
-            topicDir = options.topic
+    elif options.model is not None:
+            modelDir = options.model
+            
+    if options.class_name is None:
+            print 'No name of the category specified, system with exit\n'
+            sys.exit('System will exit')
+    else:
+            if options.class_name == 'arxiv-category':
+                fun = 0
+            elif options.class_name == 'acm-class':
+                fun = 1
+            else:
+                print 'Name of the category is incorrect, system with exit\n'
+                sys.exit('System will exit')                    
             
     if options.clf is None:
             print 'No class filename specified, system with exit\n'
@@ -203,19 +217,17 @@ if __name__ == "__main__":
             clf_dict = ioFile.load_object(options.clf_dict)              
             
     if options.output is None:
-            outFile = 'topic_of_class.json'
+        if fun == 0:
+            outFile = "class_topic_arxiv-category.pkl"
+        elif fun == 1:
+            outFile = "class_topic_acm-class.pkl"           
     elif options.output is not None:
             outFile = options.output
     
-    fun = 0
+    all_clf_topic = topicOfClassificationForAllYear(probDir, modelDir, classDir, clf_dict, fun)
     
-    all_clf_topic = topicOfClassificationForAllYear(probDir, topicDir, classDir, clf_dict, fun)
-    
-    #ioFile.save_object(all_clf_topic, "class_topic_acm-class.pkl")
-    
-    #clf_topic_stat = convertDataToJson(all_clf_topic, clf_dict, fun)
-    
-    #ioFile.save_json({"category": clf_topic_stat}, outFile)
+    ioFile.save_object(all_clf_topic, outFile)
+
     
     
     

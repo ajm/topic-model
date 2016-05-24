@@ -4,7 +4,8 @@ from src.backend import graph
 from src.backend import fileSys
 from src import ioFile
 
-root_path = '/home/pzwang/data/cs'
+#root_path = '/home/pzwang/data/cs'
+root_path = '/Users/ajm/pulp/topic-model/data/cs'
 model_path = path.join(root_path, 'lda_model')
 
 def topics_from_to(start, end):

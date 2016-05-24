@@ -18,9 +18,12 @@ var chosenYearRange = Object.assign({}, DEFAULT_YEAR_RANGE);
 const $loadingContainer = $('#loading-container');
 
 function clickTopicInSankey(text, chosen){
+
+  chosenKeywords.length = 0
+
   if (chosen) {
     chosenKeywords.push(text)
-  } else {
+  } /*else {
     var removedIndex = 0;
     chosenKeywords.forEach(function(keyword, i){
       if(keyword == text){
@@ -29,7 +32,7 @@ function clickTopicInSankey(text, chosen){
     });
 
     chosenKeywords.splice(removedIndex, 1);
-  }
+  }*/
 }
 
 function generateLabels(range){
